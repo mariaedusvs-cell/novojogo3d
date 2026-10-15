@@ -1,33 +1,29 @@
 using UnityEngine;
-using System.Collections;
 
-public class ChaoFalso : MonoBehaviour
+public class ChaoFalsoFantasminha : MonoBehaviour
 {
-    public float tempoParaCair = 0.5f; // Tempo entre pisar e o chão cair
-    private Rigidbody rb;
-
-    void Start()
+    private void OnTriggerEnter(Collider other)
     {
-        rb = GetComponent<Rigidbody>();
-    }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        // Verifica se o objeto que pisou é o jogador (adicione a tag "Player" ao seu jogador)
-        if (collision.gameObject.CompareTag("Player"))
+        // Verifica se o objeto que entrou no trigger é o jogador
+        if (other.CompareTag("Player"))
         {
-            StartCoroutine(QuedaChao());
+            // Opção A: Se o jogador usar CharacterController
+            CharacterController cc = other.GetComponent<CharacterController>();
+            if (cc != null)
+            {
+                // Desativa temporariamente o CharacterController para ele cair livremente
+                cc.enabled = false;
+                // Reativa depois de um tempo ou deixe cair (pode reativar via outro script se preferir)
+            }
+
+            // Opção B: Se o jogador usar Rigidbody
+            Rigidbody rbPlayer = other.GetComponent<Rigidbody>();
+            if (rbPlayer != null)
+            {
+                // Garante que a gravidade está ativa para ele cair
+                rbPlayer.useGravity = true;
+                rbPlayer.isKinematic = false;
+            }
         }
-    }
-
-    IEnumerator QuedaChao()
-    {
-        yield return new WaitForSeconds(tempoParaCair);
-
-        // Desativa o Kinematic para permitir que a física da gravidade atue
-        rb.isKinematic = false;
-        
-        // Opcional: destruir o chão depois de alguns segundos para limpar a cena
-        Destroy(gameObject, 5f);
     }
 }
